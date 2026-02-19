@@ -13,6 +13,7 @@ The official iOS SDK for [FeaturePortal](https://featureportal.com) - a powerful
 - **Feature Requests**: Allow users to submit and vote on feature requests directly from your app
 - **Public Roadmap**: Keep your users informed with an integrated roadmap view
 - **Real-time Updates**: Automatically sync feature requests and roadmap items
+- **Engagement Prompt**: Animated mascot that appears to active users at the right moment, with configurable thresholds, cooldowns, and opt-out support
 - **Easy Integration**: Simple configuration with just a few lines of code
 
 ## Requirements
@@ -154,6 +155,138 @@ struct MainTabView: View {
     }
 }
 ```
+
+## Engagement Prompt
+
+FeaturePortal includes an animated mascot that automatically appears to engaged users and invites them to submit feature requests. The prompt respects cooldown periods, annual caps, and user opt-out — it only shows when users are genuinely active.
+
+### How It Works
+
+The SDK tracks engagement signals across app sessions:
+
+| Signal | What it tracks |
+|--------|---------------|
+| App launches | Total number of times the app has been opened |
+| First launch date | How long the user has had the app |
+| Significant events | Key actions you define (purchases, feature usage, etc.) |
+| Recent sessions | Number of sessions within a rolling window |
+
+The mascot appears only when **all** thresholds are met, the cooldown has passed, and the user has not opted out.
+
+### Step 1 — Log App Launches
+
+Call `FeaturePortal.logAppLaunch()` once per app launch, right after `configure()`:
+
+```swift
+@main
+struct YourApp: App {
+    init() {
+        FeaturePortal.configure(apiKey: "your-api-key-here")
+        FeaturePortal.logAppLaunch() // ← increment launch count & session timestamp
+    }
+
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
+        }
+    }
+}
+```
+
+This call does two things:
+- Increments the total app launch counter
+- Records the current timestamp as a session, used to evaluate "recent activity"
+
+On the very first call it also records the first-launch date, which gates the `minDaysSinceFirstLaunch` threshold.
+
+### Step 2 — Log Significant Events
+
+Call `FeaturePortal.logSignificantEvent()` when the user completes a meaningful action — you define what "significant" means for your app:
+
+```swift
+// After a purchase
+FeaturePortal.logSignificantEvent()
+
+// After finishing onboarding
+FeaturePortal.logSignificantEvent()
+
+// After using a core feature
+FeaturePortal.logSignificantEvent()
+```
+
+### Step 3 — Add the Prompt Modifier
+
+Apply `.featurePrompt()` to your root view. The modifier checks eligibility automatically on appear and whenever the app returns to the foreground:
+
+```swift
+struct ContentView: View {
+    var body: some View {
+        TabView {
+            // ...
+        }
+        .featurePrompt()
+    }
+}
+```
+
+Customize the message and CTA text:
+
+```swift
+.featurePrompt(
+    message: "Loving the app? Help us improve it!",
+    ctaText: "Request a Feature"
+)
+```
+
+Manually trigger the prompt (e.g. from a Settings screen), bypassing eligibility checks:
+
+```swift
+struct SettingsView: View {
+    @State private var showPrompt = false
+
+    var body: some View {
+        Button("Give Feedback") {
+            showPrompt = true
+        }
+        .featurePrompt(forceShow: $showPrompt)
+    }
+}
+```
+
+### Customizing Thresholds
+
+Pass a `FeaturePromptConfiguration` to `configure()` to override the defaults:
+
+```swift
+FeaturePortal.configure(
+    apiKey: "your-api-key-here",
+    promptConfiguration: FeaturePromptConfiguration(
+        minAppLaunchCount: 3,           // default: 5
+        minDaysSinceFirstLaunch: 3,     // default: 7
+        minSignificantEventCount: 1,    // default: 3
+        minRecentSessionCount: 2,       // default: 3
+        recentSessionWindowDays: 7,     // default: 14
+        cooldownDays: 60,               // default: 30
+        maxPromptsPerYear: 6            // default: 12
+    )
+)
+```
+
+Pass `nil` to disable the engagement prompt entirely:
+
+```swift
+FeaturePortal.configure(apiKey: "your-api-key-here", promptConfiguration: nil)
+```
+
+### Development & Testing
+
+Reset all engagement data during development (e.g. on logout or in debug menus):
+
+```swift
+FeaturePortal.promptTrigger?.resetAllData()
+```
+
+Use the `forceShow` binding (see Step 3) to preview the mascot without waiting for thresholds to be met.
 
 ## Demo Project
 
