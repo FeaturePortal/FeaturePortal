@@ -324,6 +324,22 @@ This repository includes a demo project that showcases the SDK integration. To r
 
 The demo app demonstrates the basic integration and shows both the feature request and roadmap views in action.
 
+## Read Feedback from AI Agents (MCP)
+
+FeaturePortal runs a remote [MCP](https://modelcontextprotocol.io) server, so coding agents like Claude Code, Codex and Cursor can read your projects, feature requests, comments and roadmap while they work on your app.
+
+1. Create a read-only API token in **Dashboard → [API Tokens](https://featureportal.com/dashboard/api-tokens)**. It starts with `fp_pat_` and is different from the project API key you pass to `FeaturePortal.configure(apiKey:)`.
+2. Connect your agent, for example Claude Code:
+
+```bash
+claude mcp add --transport http featureportal https://featureportal.com/api/mcp \
+  --header "Authorization: Bearer fp_pat_YOUR_TOKEN"
+```
+
+3. Ask things like *"What are the top requests for my app?"* or *"Summarize this month's feedback about sync and plan the implementation."*
+
+Available tools: `list_projects`, `list_feedback`, `get_feedback`, `get_roadmap` and `get_project_stats`. See the [MCP documentation](https://featureportal.com/docs/mcp) for Codex, Cursor and other clients.
+
 ## Documentation
 
 For more information about FeaturePortal and its features, visit:
