@@ -53,6 +53,7 @@ public struct FeatureRequestList: View {
                             .background(Color.featurePortalPrimary.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
+                        .featurePortalPlainMenu()
 
                         // Filter Button
                         Button(action: { showingFilterSheet = true }) {
@@ -78,6 +79,7 @@ public struct FeatureRequestList: View {
                             .background(Color.featurePortalPrimary.opacity(0.1))
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                         }
+                        .featurePortalPlainButton()
 
                         Spacer()
                     }
@@ -176,6 +178,18 @@ public struct FeatureRequestList: View {
             .navigationBarTitleDisplayMode(.large)
             #endif
             .toolbar {
+                #if os(macOS)
+                // No pull to refresh on the Mac.
+                ToolbarItem(placement: .automatic) {
+                    Button {
+                        Task { try? await model.loadFeatureRequests() }
+                    } label: {
+                        Label("Refresh", systemImage: "arrow.clockwise")
+                    }
+                    .keyboardShortcut("r")
+                    .help("Refresh")
+                }
+                #endif
                 ToolbarItem(placement: .primaryAction) {
                     Button(action: { showingAddSheet = true }) {
                         Image(systemName: "plus.circle.fill")
@@ -183,6 +197,10 @@ public struct FeatureRequestList: View {
                             .symbolRenderingMode(.hierarchical)
                             .foregroundStyle(Color.featurePortalPrimary)
                     }
+                    #if os(macOS)
+                    .keyboardShortcut("n")
+                    .help("New Feature Request")
+                    #endif
                 }
             }
             .alert("Vote is permanent", isPresented: $showAlert) {
@@ -193,10 +211,16 @@ public struct FeatureRequestList: View {
         }
         .sheet(isPresented: $showingAddSheet) {
             SubmitFeatureRequestView(model: model)
+                #if os(macOS)
+                .frame(minWidth: 440, idealWidth: 480, minHeight: 560, idealHeight: 640)
+                #endif
         }
         .sheet(isPresented: $showingFilterSheet) {
             FilterSheet(model: model)
                 .presentationDetents([.medium])
+                #if os(macOS)
+                .frame(minWidth: 360, minHeight: 280)
+                #endif
         }
     }
 }

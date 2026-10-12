@@ -53,6 +53,7 @@ struct SubmitFeatureRequestView: View {
                                 .font(.subheadline.weight(.semibold))
 
                             TextField("Enter a clear, concise title", text: $title)
+                                .textFieldStyle(.plain)
                                 #if os(iOS)
                                 .textInputAutocapitalization(.sentences)
                                 #endif
@@ -83,6 +84,7 @@ struct SubmitFeatureRequestView: View {
                                 .font(.subheadline.weight(.semibold))
 
                             TextField("Describe your feature request in detail", text: $description, axis: .vertical)
+                                .textFieldStyle(.plain)
                                 .lineLimit(5...10)
                                 #if os(iOS)
                                 .textInputAutocapitalization(.sentences)
@@ -114,6 +116,7 @@ struct SubmitFeatureRequestView: View {
                                 .font(.subheadline.weight(.semibold))
 
                             TextField("your@email.com (optional)", text: $email)
+                                .textFieldStyle(.plain)
                                 #if os(iOS)
                                 .textInputAutocapitalization(.never)
                                 .keyboardType(.emailAddress)
@@ -160,6 +163,7 @@ struct SubmitFeatureRequestView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         .featurePortalButtonShadow()
                     }
+                    .featurePortalPlainButton()
                     .disabled(!isValid || isSubmitting)
                     .opacity(!isValid || isSubmitting ? 0.5 : 1.0)
                     .padding(.top, .grid(2))

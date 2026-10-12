@@ -17,6 +17,10 @@ public extension Color {
     static let featurePortalCardBackground = Color(uiColor: .secondarySystemGroupedBackground)
     static let featurePortalBackground = Color(uiColor: .systemGroupedBackground)
     static let featurePortalBorder = Color(uiColor: .separator)
+    #elseif os(macOS)
+    static let featurePortalCardBackground = Color(nsColor: .controlBackgroundColor)
+    static let featurePortalBackground = Color(nsColor: .windowBackgroundColor)
+    static let featurePortalBorder = Color(nsColor: .separatorColor)
     #else
     static let featurePortalCardBackground = Color.gray.opacity(0.1)
     static let featurePortalBackground = Color.gray.opacity(0.05)

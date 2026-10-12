@@ -30,6 +30,7 @@ public struct AddButton: View {
                 .shadow(color: colorScheme == .dark ? .clear : .black.opacity(0.1),
                        radius: 3, x: 1, y: 3)
         }
+        .featurePortalPlainButton()
         .accessibilityLabel("Add Feature Request")
         .accessibilityHint("Double tap to create a new feature request")
     }

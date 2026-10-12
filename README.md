@@ -1,11 +1,11 @@
 # FeaturePortal iOS SDK
 
 [![Swift](https://img.shields.io/badge/Swift-5.9+-orange.svg)](https://swift.org)
-[![Platform](https://img.shields.io/badge/Platform-iOS%2017+-blue.svg)](https://developer.apple.com)
+[![Platform](https://img.shields.io/badge/Platform-iOS%2017+%20%7C%20macOS%2014+-blue.svg)](https://developer.apple.com)
 [![SPM](https://img.shields.io/badge/SPM-compatible-brightgreen.svg)](https://swift.org/package-manager)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-The official iOS SDK for [FeaturePortal](https://featureportal.com) - a powerful feature request and roadmap management platform. Integrate beautiful, native feature request and roadmap views directly into your iOS app.
+The official iOS SDK for [FeaturePortal](https://featureportal.com) - a powerful feature request and roadmap management platform. Integrate beautiful, native feature request and roadmap views directly into your iOS or Mac app.
 
 ## Features
 
@@ -18,7 +18,7 @@ The official iOS SDK for [FeaturePortal](https://featureportal.com) - a powerful
 
 ## Requirements
 
-- iOS 17.0+
+- iOS 17.0+ or macOS 14.0+
 - Swift 5.9+
 - Xcode 15.0+
 
@@ -134,6 +134,31 @@ struct SettingsView: View {
         }
     }
 }
+```
+
+### In a Mac Window
+
+On macOS, `FeatureListView` switches between Requests and Roadmap with a segmented control, and its toolbar (Refresh ⌘R, New ⌘N) goes in the window's toolbar:
+
+```swift
+@main
+struct MyMacApp: App {
+    var body: some Scene {
+        // ...
+        Window("Feature Requests", id: "feature-requests") {
+            FeaturePortal.FeatureListView()
+        }
+    }
+}
+```
+
+In an AppKit app (a menu bar app, for instance), host it in an `NSHostingController` and let its toolbar and title reach the window:
+
+```swift
+let host = NSHostingController(rootView: FeaturePortal.FeatureListView())
+host.sceneBridgingOptions = [.toolbars, .title]
+let window = NSWindow(contentViewController: host)
+window.makeKeyAndOrderFront(nil)
 ```
 
 ### Standalone Tab
@@ -312,10 +337,8 @@ For more information about FeaturePortal and its features, visit:
 | Platform | Status | Minimum Version |
 |----------|--------|----------------|
 | iOS | ✅ Fully Supported | iOS 17.0+ |
-| macOS | 🚧 Planned | TBD |
+| macOS | ✅ Supported | macOS 14.0+ |
 | visionOS | 🚧 Planned | TBD |
-
-*Note: Currently iOS-only. macOS and visionOS support may be added in future releases.*
 
 ## Support
 
