@@ -41,13 +41,42 @@ public final class FeaturePortal {
     // MARK: - View Factory
     public struct FeatureListView: View {
         @State private var model = FeaturePortalModel()
+        #if os(macOS)
+        @State private var tab = Tab.requests
+        private enum Tab { case requests, roadmap }
+        #endif
 
         public init() {}
 
+        /// With a given model, e.g. mock data in previews.
+        init(model: FeaturePortalModel) {
+            _model = State(initialValue: model)
+        }
+
         public var body: some View {
-            #if os(macOS) || os(visionOS)
-            // TODO: macOS and visionOS support
-            Text("FeaturePortal is currently only supported on iOS")
+            #if os(macOS)
+            // A Mac TabView draws its content in an inset, bordered box: a segmented control over the content instead.
+            VStack(spacing: 0) {
+                Picker("Show", selection: $tab) {
+                    Text("Requests").tag(Tab.requests)
+                    Text("Roadmap").tag(Tab.roadmap)
+                }
+                .pickerStyle(.segmented)
+                .labelsHidden()
+                .fixedSize()
+                .padding(.vertical, .grid(2))
+                .frame(maxWidth: .infinity)
+                .background(Color.featurePortalBackground)
+
+                switch tab {
+                case .requests:
+                    FeatureRequestList(model: model)
+                case .roadmap:
+                    NavigationStack { RoadmapView(model: model) }
+                }
+            }
+            // A window or sheet on the Mac sizes itself to its content: give the list room.
+            .frame(minWidth: 460, idealWidth: 540, minHeight: 560, idealHeight: 720)
             #else
             TabView {
                 FeatureRequestList(model: model)
@@ -66,4 +95,8 @@ public final class FeaturePortal {
 
     // MARK: - Private Init
     private init() {}
+}
+
+#Preview("Mock data") {
+    FeaturePortal.FeatureListView(model: FeaturePortalModel(useMockData: true))
 }

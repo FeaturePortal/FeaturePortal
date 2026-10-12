@@ -189,6 +189,7 @@ struct FeatureRequestDetailView: View {
                             .clipShape(RoundedRectangle(cornerRadius: 10))
                             .featurePortalButtonShadow()
                         }
+                        .featurePortalPlainButton()
                         .disabled(newComment.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSubmittingComment)
                         .opacity(newComment.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSubmittingComment ? 0.5 : 1.0)
                     }
